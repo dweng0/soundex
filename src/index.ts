@@ -4,21 +4,6 @@ interface ScoreDict {
 }
 
 /**
- * I have written this script based on the wikipedia definition of soundex found here:
- * using the american soundex algorithm: https://en.wikipedia.org/wiki/Soundex
- */
-const testWords: string[] = [
-  "Robert",
-  "Rupert",
-  "Rubin",
-  "Ashcraft",
-  "Ashcroft",
-  "Tymczak",
-  "Pfister",
-  "Honeyman",
-];
-
-/**
  * the vowels ....and y
  */
 const vowelLikeCharacters: string[] = ["a", "e", "i", "o", "u", "y"];
@@ -58,9 +43,7 @@ const phoneticScoreDictionary: ScoreDict[] = [
  */
 const findInDictionary = function (letter: string) {
   return phoneticScoreDictionary.find((phoneticLetters) => {
-    return phoneticLetters.matches.find(
-      (character) => character.toLowerCase() === letter.toLowerCase()
-    );
+    return phoneticLetters.matches.find((character) => character === letter);
   });
 };
 
@@ -68,33 +51,27 @@ const findInDictionary = function (letter: string) {
  * If two or more letters with the same number are adjacent in the original name,
  * only retain the first letter
  */
-const stripAdjacentLetters = function (searchAsArray: string[]) {
-  let previousLetter = "";
-  return searchAsArray.filter(function (letter) {
-    const matchesPreviousLetter = !!(letter === previousLetter);
-    previousLetter = letter;
-    return matchesPreviousLetter;
+const stripAdjacentLetters = function (charactersArray: string[]) {
+  return charactersArray.filter((char, index) => {
+    if (index === 0) {
+      // Always keep the first character
+      return true;
+    }
+    // Keep the character only if it's not the same as the previous one
+    return char !== charactersArray[index - 1];
   });
 };
 
 /**
  *  Rejects from the first array anything found in the second array
  */
-const rejectFromArray = function (
-  arrayToRejectFrom: string[],
-  rejectionCriteriaArray: string[]
-) {
-  return arrayToRejectFrom.filter(function (itemToTestAgainst) {
-    return !!rejectionCriteriaArray.find(function (itemToTestFor) {
-      return itemToTestFor === itemToTestAgainst;
-    });
-  });
-};
-
+function rejectFromArray(mainArray: string[], filterArray: string[]): string[] {
+  return mainArray.filter((char) => !filterArray.includes(char));
+}
 /**
  * Returns the score for the string passed in
  */
-const soundexScore = function (word: string) {
+export const soundexScore = function (word: string) {
   if (!word) {
     throw new Error("Word is missing...");
   }
@@ -103,9 +80,10 @@ const soundexScore = function (word: string) {
     throw new Error(`No single letter words. Its score would be: ${word}000`);
   }
 
-  word.trim();
-  word.toLowerCase();
-  const rawWordsAsArray = stripAdjacentLetters(word.split(""));
+  const rawWordsAsArray = stripAdjacentLetters(
+    word.trim().toLowerCase().split("")
+  );
+
   const firstLetter = rawWordsAsArray[0];
   const restOfWord = rawWordsAsArray.slice(1);
   let wordStrippedOfVowels = rejectFromArray(restOfWord, vowelLikeCharacters);
@@ -115,7 +93,7 @@ const soundexScore = function (word: string) {
   const vowelsPlusHW = vowelLikeCharacters.concat("h", "w");
   if (!vowelsPlusHW.find((vowel) => vowel === firstLetter.toLowerCase())) {
     if (
-      findInDictionary(firstLetter.toLowerCase())?.score ===
+      findInDictionary(firstLetter)?.score ===
       findInDictionary(rejectFromArray(restOfWord, vowelsPlusHW)[0])?.score
     ) {
       //if the scores match, remove the offending letter from array;
@@ -128,27 +106,27 @@ const soundexScore = function (word: string) {
   let previousScore = 0;
   let lastWasH_or_W = false;
 
-  //reduce array down to a phonetic score
-  let result = wordStrippedOfVowels.reduce(function (memo, letter) {
-    let match = findInDictionary(letter);
+  // Reduce array down to a phonetic score
+  let result = wordStrippedOfVowels.reduce((accumulator, currentLetter) => {
+    let match = findInDictionary(currentLetter);
     if (match && lastWasH_or_W && match.score === previousScore) {
-      // "h or w" condition met... unset the match
+      // "h or w" condition met, unset the match
       match = undefined;
     }
 
-    lastWasH_or_W = letter === "h" || letter === "w";
-    if (match) {
-      previousScore = match.score;
-    }
-    return match && memo.length < 4 ? memo + match.score : memo;
+    // Update lastWasH_or_W and previousScore based on current letter and match
+    lastWasH_or_W = currentLetter === "h" || currentLetter === "w";
+    previousScore = match ? match.score : previousScore;
+
+    // Return the updated accumulator
+    return match && accumulator.length < 4
+      ? accumulator + match.score
+      : accumulator;
   }, firstLetter);
 
   let appender = 4 - result.length;
   for (var i = 0; i < appender; i++) {
     result += "0";
   }
-  return result;
+  return result.toUpperCase();
 };
-
-//test each word in the testwords array
-testWords.forEach(soundexScore);
