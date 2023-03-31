@@ -69,7 +69,7 @@ const findInDictionary = function (letter: string) {
  * only retain the first letter
  */
 const stripAdjacentLetters = function (searchAsArray: string[]) {
-  let previousLetter;
+  let previousLetter = "";
   return searchAsArray.filter(function (letter) {
     const matchesPreviousLetter = !!(letter === previousLetter);
     previousLetter = letter;
@@ -147,7 +147,6 @@ const soundexScore = function (word: string) {
   for (var i = 0; i < appender; i++) {
     result += "0";
   }
-  console.log(result);
   return result;
 };
 
