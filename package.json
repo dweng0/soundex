@@ -1,0 +1,28 @@
+{
+  "name": "soundex",
+  "version": "1.0.0",
+  "description": "Phonetic algorithm for indexing names by sound as pronounced in English.",
+  "main": "lib/index.min.js",
+  "scripts": {
+    "build": "tsc && terser compiled/index.js -o lib/index.min.js",
+    "test": "jest",
+    "test:coverage": "jest --coverage"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dweng0/soundex.git"
+  },
+  "author": "Jay",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dweng0/soundex/issues"
+  },
+  "homepage": "https://github.com/dweng0/soundex#readme",
+  "devDependencies": {
+    "@types/jest": "^29.5.0",
+    "jest": "^29.5.0",
+    "terser": "^5.16.8",
+    "ts-jest": "^29.0.5",
+    "typescript": "^5.0.3"
+  }
+}
