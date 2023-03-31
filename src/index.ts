@@ -114,6 +114,11 @@ export const soundexScore = function (word: string) {
       match = undefined;
     }
 
+    if (currentLetter === "k" && previousScore === 2) {
+      // "c" condition met, unset the match
+      match = undefined;
+    }
+
     // Update lastWasH_or_W and previousScore based on current letter and match
     lastWasH_or_W = currentLetter === "h" || currentLetter === "w";
     previousScore = match ? match.score : previousScore;

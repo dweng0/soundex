@@ -5,7 +5,8 @@
   "main": "lib/index.min.js",
   "scripts": {
     "build": "tsc && terser compiled/index.js -o lib/index.min.js",
-    "test": "jest"
+    "test": "jest",
+    "test:coverage": "jest --coverage"
   },
   "repository": {
     "type": "git",
