@@ -79,6 +79,12 @@ export const soundexScore = function (word: string) {
   if (word.length < 2) {
     throw new Error(`No single letter words. Its score would be: ${word}000`);
   }
+  const alphabetical = /^[A-Za-z]+$/;
+  if (!alphabetical.test(word)) {
+    throw new Error(
+      `Only alphabetical characters are allowed, please use substitution for non alphabetical words: ${word}`
+    );
+  }
 
   const rawWordsAsArray = stripAdjacentLetters(
     word.trim().toLowerCase().split("")

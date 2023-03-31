@@ -10,6 +10,12 @@ describe("edge cases", () => {
       "No single letter words. Its score would be: a000"
     );
   });
+
+  it("Should throw an error if the word is not alphabetical", () => {
+    expect(() => soundexScore("a1")).toThrowError(
+      "Only alphabetical characters are allowed, please use substitution for non alphabetical words: a1"
+    );
+  });
 });
 
 describe("soundexScore tests", () => {
